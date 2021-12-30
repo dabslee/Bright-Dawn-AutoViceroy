@@ -1,3 +1,8 @@
+:root {
+    --superdarkgray: #181818;
+    --offwhite: #b0b0b0;
+}
+
 table {
     border: black 1px solid;
     border-collapse: collapse;
@@ -11,6 +16,8 @@ table {
 }
 
 body {
+    background-color: var(--superdarkgray);
+    color: var(--offwhite);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -26,4 +33,22 @@ body {
 
 #footer {
     padding: 2rem 0;
+}
+
+.dropdown-menu {
+    background-color: #303030;
+    color: var(--offwhite);
+}
+.dropdown-item {
+    color: var(--offwhite);
+
+    &:hover {
+        background-color: #444444;
+        color: var(--offwhite)
+    }
+}
+
+input, select {
+    background-color: #303030;
+    color: var(--offwhite);
 }
