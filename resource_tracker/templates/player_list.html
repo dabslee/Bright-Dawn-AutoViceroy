@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<table>
+    <tr>
+        <th>Player Username</th>
+        <th>Player Discord</th>
+        <th>Join Date</th>
+        <th>Downtime Days</th>
+        <th>Spellcaster Hours</th>
+        <th>Viceroy?</th>
+        <th>Unredeemed Viceroy tokens</th>
+        <th>GM?</th>
+        <th>Unredeemed GM tokens</th>
+    </tr>
+    {% for plr in players %}
+    <tr>
+        <td>{{plr.user.username}}</td>
+        <td>{{plr.discord}}</td>
+        <td>{{plr.created}}</td>
+        <td>{{plr.downtime}}</td>
+        <td>{{plr.spellcaster_hours}}</td>
+        <td>{{plr.isViceroy}}</td>
+        <td>{{plr.viceroy_tokens}}</td>
+        <td>{{plr.isGM}}</td>
+        <td>{{plr.gm_tokens}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

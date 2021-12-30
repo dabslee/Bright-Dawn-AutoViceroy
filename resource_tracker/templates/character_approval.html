@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block body %}
+<form id="approval_form" action="{% url 'resource_tracker:character_approval' %}" method="POST">
+    {% csrf_token %}
+    {{form|linebreaks}}
+    <datalist id="discords">
+        {% for discord in discords %}
+        <option value="{{discord}}"></option>
+        {% endfor %}
+    </datalist>
+    <datalist id="characters"></datalist>
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}
+
+{% block footer %}
+<script>
+    $("#id_player_discord").attr("list", "discords");
+    $("#id_character_name").attr("list", "characters");
+    $("#id_player_discord").change(function() {
+        $.ajax({url:"/resource_tracker/get_username_from_discord/"+encodeURIComponent($("#id_player_discord").val()),
+            success: function(result){
+                $("#id_player_username").val(result);
+                $("#id_player_username").attr("disabled", true);
+            },
+            error: function(){
+                $("#id_player_username").val("");
+                $("#id_player_username").attr("disabled", false);
+            }
+        });
+        $.ajax({url:"/resource_tracker/get_approval_characters_from_discord/"+encodeURIComponent($("#id_player_discord").val()),
+            success: function(result){
+                let options = "";
+                for (option of result.split("<br>")) {
+                    options += "<option value=\"" + option + "\"></option>"
+                }
+                $("#characters").html(options);
+            }
+        });
+    });
+    $("#id_character_name").change(function() {
+        $.ajax({url:"/resource_tracker/get_wealth_from_character/"+encodeURIComponent($("#id_player_discord").val())+"/"+encodeURIComponent($("#id_character_name").val()),
+            success: function(result){
+                $("#id_character_starting_wealth").val(result);
+            }
+        });
+    })
+    $('#approval_form').submit(function(){
+        $("#approval_form :disabled").removeAttr('disabled');
+    });
+</script>
+{% endblock %}

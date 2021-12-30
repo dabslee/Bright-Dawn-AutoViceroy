@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block body %}
+<form action="{% url 'resource_tracker:claim_gm_rewards' %}" method="POST">
+    {% csrf_token %}
+    {{form|linebreaks}}
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}

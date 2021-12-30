@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<table>
+    <tr>
+        <th>Player Username</th>
+        <th>Character Name</th>
+        <th>Date Approved</th>
+        <th>Status</th>
+        <th>Money (gp)</th>
+        <th>XP (# games)</th>
+    </tr>
+    {% for chr in characters %}
+    <tr>
+        <td>{{chr.player}}</td>
+        <td>{{chr.name}}</td>
+        <td>{{chr.approved}}</td>
+        <td>{{chr.get_status_display}}</td>
+        <td>{{chr.money}}</td>
+        <td>{{chr.xp}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

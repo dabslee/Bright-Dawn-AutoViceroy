@@ -1,0 +1,30 @@
+table {
+  border: black 1px solid;
+  border-collapse: collapse;
+}
+table th, table td {
+  border: black 1px solid;
+  border-collapse: collapse;
+  padding: 0 10px;
+  text-align: left;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.container {
+  max-width: 80rem;
+}
+
+.content {
+  flex: 2 2 auto;
+}
+
+#footer {
+  padding: 2rem 0;
+}
+
+/*# sourceMappingURL=main.css.map */

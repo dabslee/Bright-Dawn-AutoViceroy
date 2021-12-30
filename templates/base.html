@@ -1,0 +1,136 @@
+{% load static %}
+
+<html>
+<header>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- JQuery CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <!-- Bootstrap CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+    
+    <!-- Babel CDN -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <title>
+        Bright Dawn AutoViceroy:&nbsp;
+        {% block title %}
+        {% endblock %}
+    </title>
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}"/>
+    
+    {% block header %}
+    {% endblock %}
+</header>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+        <div class="container container-fluid">
+            <a class="navbar-brand d-flex flex-row align-items-center" href="{% url 'home' %}">
+                <img src="{% static 'img/logo.png' %}" style="width: 2rem; border-radius: 25%;">
+                <span class="ms-3">Bright Dawn AutoViceroy</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav d-flex" style="flex: 2 2 auto">
+                    {% if user.is_authenticated %}
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownTrade" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Trade
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownTrade">
+                            <li><a class="dropdown-item" href="#">Declare a trade</a></li>
+                            <li><a class="dropdown-item" href="#">Declare a loan</a></li>
+                            <li><a class="dropdown-item" href="#">Repay a loan</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownClaim" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Resources
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownClaim">
+                            <li><a class="dropdown-item" href="{% url 'resource_tracker:claim_downtime' %}">Claim downtime</a></li>
+                            <li><a class="dropdown-item" href="{% url 'resource_tracker:spend_resources' %}">Spend resources</a></li>
+                            <li><a class="dropdown-item" href="{% url 'resource_tracker:claim_game_rewards' %}">Claim game rewards</a></li>
+                        </ul>
+                    </li>
+
+                    {% if user_player.isGM %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownGM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            GM
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownGM">
+                            <li><a class="dropdown-item" href="{% url 'resource_tracker:claim_gm_rewards' %}">Claim GM rewards</a></li>
+                            <li><a class="dropdown-item" href="#">Redeem GM rewards</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    {% if user_player.isViceroy %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownViceroy" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Viceroy
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownViceroy">
+                            <li><a class="dropdown-item" href="{% url 'resource_tracker:character_approval' %}">Declare new character approval</a></li>
+                            <li><a class="dropdown-item" href="{% url 'resource_tracker:redeem_viceroy_rewards' %}">Redeem Viceroy rewards</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    {% if user_player.isGM or user_player.isViceroy %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownLists" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Member lists
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownLists">
+                            <li><a class="dropdown-item" href="{% url 'resource_tracker:character_list' %}">List of characters</a></li>
+                            <li><a class="dropdown-item" href="{% url 'resource_tracker:player_list' %}">List of players</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item"><a class="nav-link" href="{% url 'resource_tracker:ledger' %}">Public ledger</a></li>
+
+                    <div class="d-flex" style="flex: 2 2 auto; justify-content: flex-end;">
+                        <li class="nav-item"><a class="nav-link" href="{% url 'resource_tracker:my_account' %}">Logged in as <i>{{user.username}}</i></a></li>
+                        <a class="nav-link" href="{% url 'authentication:logout' %}">Log Out</a>
+    
+                        {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'authentication:login' %}">Log In</a></li>
+                        {% endif %}
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="content">
+        <div class="container">
+            {% block body %}
+            {% endblock %}
+        </div>
+    </div>
+    
+    <div id="footer" class="bg-secondary text-light mt-5">
+        <div class="container" style="text-align: center;">
+            <div class="mb-2">Created by <b>argus</b> for the <i>Bright Dawn</i> D&D5e West Marches Server.</div>
+        </div>
+    </div>
+</body>
+<footer>
+    {% block footer %}
+    {% endblock %}
+</footer>
+</html>

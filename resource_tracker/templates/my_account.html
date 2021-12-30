@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<ul>
+    <li><b>Username:</b> {{user.username}}</li>
+    <li><b>Discord handle:</b> {{player.discord}}</li>
+    <li><b>Downtime Days:</b> {{player.downtime}}</li>
+    <li><b>Spellcaster Hours:</b> {{player.spellcaster_hours}}</li>
+    {% if player.isViceroy %}
+    <li><b>Unredeemed Viceroy tokens:</b> {{player.viceroy_tokens}}</li>
+    {% endif %}
+    {% if player.isGM %}
+    <li><b>Unredeemed GM tokens:</b> {{player.gm_tokens}}</li>
+    {% endif %}
+</ul>
+
+Characters:
+<ul>
+    {% for chr in characters %}
+    <li><b>{{chr.name}}</b></li>
+    <ul>
+        <li><b>Date approved:</b> {{chr.approved}}</li>
+        <li><b>Status:</b> {{chr.get_status_display}}</li>
+        <li><b>Money:</b> {{chr.money}} gp</li>
+        <li><b>Game XP:</b> {{chr.xp}} games' worth</li>
+    </ul>
+    {% endfor %}
+</ul>
+
+{% endblock %}

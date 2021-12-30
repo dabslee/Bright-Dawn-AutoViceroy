@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block body %}
+<form action="{% url 'resource_tracker:redeem_viceroy_rewards' %}" method="POST">
+    {% csrf_token %}
+    {{form|linebreaks}}
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}
+
+{% block footer %}
+<script>
+    $("#id_number_of_tokens").attr("type", "range");
+</script>
+{% endblock %}

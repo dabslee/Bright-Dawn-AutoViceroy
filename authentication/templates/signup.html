@@ -1,0 +1,25 @@
+<h2>Sign up</h2>
+<form method="post">
+{% csrf_token %}
+{{ form }}
+
+{% if form.errors %}
+<div style="color:red">
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<br>
+<input type="submit" value="Sign up" class="btn btn-primary"></input>
+</form>
