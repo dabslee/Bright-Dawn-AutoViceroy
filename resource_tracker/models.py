@@ -27,7 +27,7 @@ class Player(models.Model):
 
 class Character(models.Model):
     created = models.DateTimeField(null=True, auto_now_add=True)
-    approved = models.DateTimeField(null=True)
+    approved = models.DateTimeField(null=True, blank=True)
     player = models.ForeignKey(
         Player,
         on_delete=models.CASCADE
