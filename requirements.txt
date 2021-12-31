@@ -1,8 +1,8 @@
 gunicorn
-django
-django-crispy-forms
-whitenoise
-django-heroku
-pytz
-psycopg2-binary
 dj-database-url
+Django
+psycopg2-binary
+whitenoise
+django-crispy-forms
+django-quill-editor
+pytz
