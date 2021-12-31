@@ -1,9 +1,36 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block title %}
 Home
 {% endblock %}
 
 {% block body %}
-<p>Welcome to the Bright Dawn AutoViceroy—a resource tracker for all your Bright Dawn needs!</p>
+<p>Welcome to the Bright Dawn AutoViceroy webapp, a resource tracker for all your Bright Dawn needs!</p>
+
+<div class="card flex-sm-row">
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        <img src="{% static 'img/logo_full.jpg' %}" style="border-radius: 2rem; margin: 0.75rem 1rem; height:10rem;">
+        <div href="https://disboard.org/server/join/625068275310788670" class="btn btn-sm text-light mb-2" style="background-color: #5865F2;">
+            <i class="fab fa-discord me-2"></i> Join Server
+        </div>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">About the Bright Dawn Server</h5>
+        <p>Welcome to the BrightDawn Guild, the continuously updating, dynamic West Marches server! We are currently at 400+ players, and we're always seeking more players and DMs. We even have short 2 hour games for those who really cant stay for a 4 hour game! In the future we plan to have events along with the ComicCons held around the world! Come join us for a world of adventure!</p>
+        <p>We use Discord as our main hub, along with Roll20 where our games and characters are stored and used.</p>
+        <p>We also ask everyone to keep it PG13, as there are a few minors in the guild. We do take the protection of minors & women seriously. We also take serious any derogatory speech or actions. We are pro LGBTQ. We ask that you keep real world topics outside.</p>
+    </div>
+</div>
+
+<h2 class="mt-4">History of the Guild</h2>
+<h3>Pre-calamity</h3>
+<p>A few centuries ago, a mercenary named Blacktoxic led a band of mercenaries against the rule of a Mind Flayer colony that was using their village as a mind farm. After being elected as their chief, Blacktoxic renamed the simple band of mercenaries as the "Bright Dawn Guild."</p>
+<p>The guild took on many missions, traveling and fighting anywhere they could to bring back money to repair the village. The village slowly stabilized and then grew, eventually becoming a city with numerous diverse races. The guild grew along with the city as the number of missions increased, inducting new recruits and creating squadrons to go on several missions at once—once just a few dozen members, it quickly grew to a few hundred. The guild's reach also increased, not only doing jobs on their own planet, but traveling to others to help, as well. The members carefully cultivated the guild's reputation that it was no simple band of brutes, but a group of professionals who would provide the best assistance to any and every creature in need.</p>
+<p>The old mercenaries took it upon themselves to teach the new recruits how to fight and survive. Eventually, Blacktoxic stepped down from the guild to govern the city for a few years before succumbing to old age. He was succeeded by Makarov, a dwarf wizard, who led for many years after.</p>
+<h3>Post-calamity</h3>
+<p>Unfortunately, the guild's days of stable happiness did not last. Multiple tarrasque-dragon hybrids assaulted our lands, slaughtering our allies and friends. The guild recalled all its members to fight, but the might of these abominations were too much. As the battle became desperate, an enormous ship appeared overhead. At first, its intentions were unclear, but it soon became apparent that it was there to help people escape and survive.</p>
+<p>With the loss of our lands and our people, the surviving members were enveloped in a blinding white and taken aboard. The ship flew away in the nick of time, leaving the world to die. Within the ship, we met many others who were refugees from other worlds lost just like ours. Looking outside, there seemed to be hundreds of other ships similar to ours, though we separated before landing on our new home planet: The Reach.</p>
+<p>Though the campsite only has a few buildings and our leadership has collapsed, we are quickly recovering and growing once again. We continue to send our members on missions all across the multiverse, aiding whoever is in need. Times are hard, and the road may be difficult, but we will prevail, we will survive, and we will prosper!</p>
 {% endblock %}
