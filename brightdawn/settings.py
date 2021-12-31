@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-rz2szvdpnx17=j2s7oh1$+2r!bed=pf3if%_cn)ctj6#y#^yga
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "0.0.0.0",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
@@ -132,3 +136,6 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/'
+
+import django_heroku
+django_heroku.settings(locals())
