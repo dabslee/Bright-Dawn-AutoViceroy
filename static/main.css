@@ -4,8 +4,7 @@
 }
 
 table {
-  border: black 1px solid;
-  border-collapse: collapse;
+  color: var(--offwhite) !important;
 }
 table th, table td {
   border: black 1px solid;
@@ -47,9 +46,23 @@ body {
   color: var(--offwhite);
 }
 
+.form-group {
+  margin-bottom: 1rem;
+}
+
 input, select {
-  background-color: #303030;
-  color: var(--offwhite);
+  background-color: #303030 !important;
+  color: var(--offwhite) !important;
+  border-style: none !important;
+}
+
+input[type=submit] {
+  padding: 0.5rem 2rem;
+  border-radius: 1rem;
+  transition: 0.2s;
+}
+input[type=submit]:hover {
+  background-color: #444444 !important;
 }
 
 /*# sourceMappingURL=main.css.map */

@@ -1,9 +1,18 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
+{% block title %}
+Spend Resources
+{% endblock %}
+{% block page_title %}
+Spend Resources
+{% endblock %}
+
 {% block body %}
 <form action="{% url 'resource_tracker:spend_resources' %}" method="POST">
     {% csrf_token %}
-    {{form|linebreaks}}
+    {{form|crispy}}
     <input type="submit" value="Submit">
 </form>
 {% endblock %}

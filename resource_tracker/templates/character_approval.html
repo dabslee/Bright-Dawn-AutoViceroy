@@ -1,9 +1,18 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
+{% block title %}
+Character Approval
+{% endblock %}
+{% block page_title %}
+Character Approval
+{% endblock %}
+
 {% block body %}
 <form id="approval_form" action="{% url 'resource_tracker:character_approval' %}" method="POST">
     {% csrf_token %}
-    {{form|linebreaks}}
+    {{form|crispy}}
     <datalist id="discords">
         {% for discord in discords %}
         <option value="{{discord}}"></option>

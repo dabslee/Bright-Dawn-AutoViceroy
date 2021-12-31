@@ -1,0 +1,5 @@
+gunicorn
+django
+django-crispy-forms
+whitenoise
+django-heroku

@@ -1,18 +1,29 @@
 {% extends "base.html" %}
 
+{% block title %}
+Public Ledger
+{% endblock %}
+{% block page_title %}
+Public Ledger
+{% endblock %}
+
 {% block body %}
 
-<table>
-    <tr>
-        <th>Timestamp</th>
-        <th>Note</th>
-    </tr>
-    {% for log in logs %}
-    <tr>
-        <td>{{log.created}}</td>
-        <td>{{log.note}}</td>
-    </tr>
-    {% endfor %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Note</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td>{{log.created}}</td>
+            <td>{{log.note}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 
 {% endblock %}

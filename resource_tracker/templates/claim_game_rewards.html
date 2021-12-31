@@ -1,9 +1,18 @@
 {% extends "base.html" %}
 
+{% block title %}
+Claim Game Rewards
+{% endblock %}
+{% block page_title %}
+Claim Game Rewards
+{% endblock %}
+
+{% load crispy_forms_tags %}
+
 {% block body %}
 <form action="{% url 'resource_tracker:claim_game_rewards' %}" method="POST">
     {% csrf_token %}
-    {{form|linebreaks}}
+    {{form|crispy}}
     <input type="submit" value="Submit">
 </form>
 {% endblock %}
