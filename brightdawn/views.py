@@ -14,7 +14,7 @@ def lastSundayMidnight():
 def alwaysContext(request):
     if request.user.is_authenticated:
         user_player = Player.objects.get(user=request.user)
-        if user_player.last_spellcaster_claim < lastSundayMidnight():
+        if user_player.last_spellcaster_claim == None or user_player.last_spellcaster_claim < lastSundayMidnight():
             user_player.spellcaster_hours = 24
             user_player.last_spellcaster_claim = datetime.datetime.now()
             user_player.save()
