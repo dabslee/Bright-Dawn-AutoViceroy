@@ -4,3 +4,5 @@ django-crispy-forms
 whitenoise
 django-heroku
 pytz
+psycopg2-binary
+dj-database-url
