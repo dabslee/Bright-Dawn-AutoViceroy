@@ -51,19 +51,19 @@ class SpendResourcesForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields["character_name"].choices = character_name_choices
 
-class TradeForm(forms.Form):
-    my_character_name = forms.ChoiceField(choices=())
-    other_player_username = forms.ChoiceField(choices=list([(player.user.username, player.user.username) for player in Player.objects.all()]))
-    other_player_character_name = forms.ChoiceField(choices=())
-    selling_or_buying = forms.ChoiceField(choices=(
-        ("Selling", "Selling"),
-        ("Buying", "Buying")
-    ))
-    money_amount = forms.FloatField(min_value=0)
-    what_was_purchased = forms.CharField(max_length=1000)
-    other_stipulations = forms.CharField(max_length=1000)
+# class TradeForm(forms.Form):
+#     my_character_name = forms.ChoiceField(choices=())
+#     other_player_username = forms.ChoiceField(choices=list([(player.user.username, player.user.username) for player in Player.objects.all()]))
+#     other_player_character_name = forms.ChoiceField(choices=())
+#     selling_or_buying = forms.ChoiceField(choices=(
+#         ("Selling", "Selling"),
+#         ("Buying", "Buying")
+#     ))
+#     money_amount = forms.FloatField(min_value=0)
+#     what_was_purchased = forms.CharField(max_length=1000)
+#     other_stipulations = forms.CharField(max_length=1000)
 
-    def __init__(self, *args, **kwargs):
-        character_name_choices = kwargs.pop('character_name_choices')
-        super().__init__(*args, **kwargs)
-        self.fields["my_character_name"].choices = character_name_choices
+#     def __init__(self, *args, **kwargs):
+#         character_name_choices = kwargs.pop('character_name_choices')
+#         super().__init__(*args, **kwargs)
+#         self.fields["my_character_name"].choices = character_name_choices
