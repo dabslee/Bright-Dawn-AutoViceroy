@@ -12,14 +12,15 @@ def lastSundayMidnight():
     return last_sunday
 
 def alwaysContext(request):
-    user_player = Player.objects.get(user=request.user)
-    if user_player.last_spellcaster_claim < lastSundayMidnight():
-        user_player.spellcaster_hours = 24
-        user_player.last_spellcaster_claim = datetime.datetime.now()
-        user_player.save()
-    return {
-        "user_player" : user_player
-    }
+    if request.user.is_authenticated:
+        user_player = Player.objects.get(user=request.user)
+        if user_player.last_spellcaster_claim < lastSundayMidnight():
+            user_player.spellcaster_hours = 24
+            user_player.last_spellcaster_claim = datetime.datetime.now()
+            user_player.save()
+        return {
+            "user_player" : user_player
+        }
 
 def home(request):
     return render(request, "home.html", alwaysContext(request))

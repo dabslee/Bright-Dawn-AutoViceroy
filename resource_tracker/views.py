@@ -7,6 +7,7 @@ from django.http import HttpResponse
 
 from datetime import datetime
 from brightdawn.views import alwaysContext, lastSundayMidnight
+from django.contrib.auth.decorators import login_required
 
 # Utilities
 def get_tier(character):
@@ -42,13 +43,13 @@ def get_wealth_from_character(request, discord, character):
     ).money)
 
 # Standard views
+@login_required
 def ledger(request):
-    if not request.user.is_authenticated:
-        raise PermissionDenied()
     context = alwaysContext(request)
     context["logs"] = LedgerLog.objects.all().order_by("-created")
     return render(request, "ledger.html", context)
 
+@login_required
 def claim_downtime(request):
     context = alwaysContext(request)
     user_player = context["user_player"]
@@ -62,9 +63,8 @@ def claim_downtime(request):
         context["message"] = "Unsuccessful! Downtime already claimed for this week!"
         return render(request, "success.html", context)
 
+@login_required
 def spend_resources(request):
-    if not request.user.is_authenticated:
-        raise PermissionDenied()
     context = alwaysContext(request)
     if request.method == 'POST':
         form = forms.SpendResourcesForm(request.POST,
@@ -151,8 +151,9 @@ def character_approval(request):
         context["discords"] = [player.discord for player in Player.objects.all()]
         return render(request, "character_approval.html", context)
 
+@login_required
 def redeem_viceroy_rewards(request):
-    if not request.user.is_authenticated or not Player.objects.get(user=request.user).isViceroy:
+    if not Player.objects.get(user=request.user).isViceroy:
         raise PermissionDenied()
     if request.method == 'POST':
         form = forms.RedeemViceroyRewardsForm(request.POST,
@@ -200,9 +201,8 @@ def redeem_viceroy_rewards(request):
         )
         return render(request, "redeem_viceroy_rewards.html", context)
 
+@login_required
 def claim_game_rewards(request):
-    if not request.user.is_authenticated:
-        raise PermissionDenied()
     if request.method == 'POST':
         form = forms.ClaimGameRewardsForm(request.POST,
             character_name_choices = list([
@@ -231,8 +231,9 @@ def claim_game_rewards(request):
         ]))
         return render(request, "claim_game_rewards.html", context)
 
+@login_required
 def claim_gm_rewards(request):
-    if not request.user.is_authenticated or not Player.objects.get(user=request.user).isGM:
+    if not Player.objects.get(user=request.user).isGM:
         raise PermissionDenied()
     if request.method == 'POST':
         form = forms.ClaimGMRewardsForm(request.POST)
@@ -254,23 +255,24 @@ def claim_gm_rewards(request):
         context["form"] = forms.ClaimGMRewardsForm()
         return render(request, "claim_gm_rewards.html", context)
 
+@login_required
 def character_list(request):
-    if not request.user.is_authenticated or not (Player.objects.get(user=request.user).isViceroy or Player.objects.get(user=request.user).isGM):
+    if not (Player.objects.get(user=request.user).isViceroy or Player.objects.get(user=request.user).isGM):
         raise PermissionDenied()
     context = alwaysContext(request)
     context["characters"] = Character.objects.all()
     return render(request, "character_list.html", context)
 
+@login_required
 def player_list(request):
-    if not request.user.is_authenticated or not (Player.objects.get(user=request.user).isViceroy or Player.objects.get(user=request.user).isGM):
+    if not (Player.objects.get(user=request.user).isViceroy or Player.objects.get(user=request.user).isGM):
         raise PermissionDenied()
     context = alwaysContext(request)
     context["players"] = Player.objects.all()
     return render(request, "player_list.html", context)
 
+@login_required
 def my_account(request):
-    if not request.user.is_authenticated:
-        raise PermissionDenied()
     context = alwaysContext(request)
     context["player"] = Player.objects.get(user=request.user)
     context["characters"] = Character.objects.filter(player__user=request.user)
