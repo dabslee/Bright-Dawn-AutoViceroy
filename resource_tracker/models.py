@@ -13,9 +13,9 @@ class Player(models.Model):
     )
     discord = models.CharField(max_length=50)
     downtime = models.PositiveIntegerField(default=0)
-    last_downtime_claim = models.DateTimeField()
+    last_downtime_claim = models.DateTimeField(null=True, blank=True)
     spellcaster_hours = models.FloatField(default=0)
-    last_spellcaster_claim = models.DateTimeField()
+    last_spellcaster_claim = models.DateTimeField(null=True, blank=True)
 
     isViceroy = models.BooleanField(default=False)
     viceroy_tokens = models.PositiveIntegerField(default=0)

@@ -53,7 +53,7 @@ def ledger(request):
 def claim_downtime(request):
     context = alwaysContext(request)
     user_player = context["user_player"]
-    if user_player.last_downtime_claim < lastSundayMidnight():
+    if user_player.last_downtime_claim == None or user_player.last_downtime_claim < lastSundayMidnight():
         user_player.downtime += 10
         user_player.last_downtime_claim = datetime.now()
         user_player.save()
