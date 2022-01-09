@@ -79,6 +79,10 @@ input[type=submit]:hover {
   background-color: rgba(255, 0, 0, 0.2);
 }
 
+a {
+  color: dodgerblue;
+}
+
 .navbar li a:hover {
   background-color: var(--superdarkgray);
 }
