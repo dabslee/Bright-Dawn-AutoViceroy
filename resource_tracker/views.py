@@ -21,6 +21,16 @@ def get_tier(character):
     else:
         return 4
 
+def gold_by_tier(tier):
+    if tier == 1:
+        return 80
+    elif tier == 2:
+        return 250
+    elif tier == 3:
+        return 1000
+    elif tier == 4:
+        return 5000
+
 # AJAX views
 def get_username_from_discord(request, discord):
     return HttpResponse(Player.objects.get(discord=discord).user.username)
@@ -294,6 +304,91 @@ def claim_gm_rewards(request):
         context = alwaysContext(request)
         context["form"] = forms.ClaimGMRewardsForm()
         return render(request, "claim_gm_rewards.html", context)
+
+def redeem_gm_rewards(request):
+    if not Player.objects.get(user=request.user).isGM:
+        raise PermissionDenied()
+    context = alwaysContext(request)
+    if request.method == 'POST':
+        form = forms.RedeemGMRewardsForm(request.POST,
+            character_name_choices = list([
+                (character.name, character.name) for character in Character.objects.filter(player__user=request.user)
+            ])
+        )
+
+        if form.is_valid():
+            expenditure = form.cleaned_data["expenditure"]
+            character = Character.objects.get(player__user=request.user, name=form.cleaned_data["character_name"])
+            tier = get_tier(character)
+
+            xp_reward = 0
+            gp_reward = 0
+            spent_tokens = 0
+            if expenditure == "Full Game XP + Full Game GP":
+                xp_reward = 1
+                gp_reward = gold_by_tier(tier)
+                spent_tokens = 8
+            elif expenditure == "Half Game XP + Half Game GP":
+                xp_reward = 0.5
+                gp_reward = gold_by_tier(tier)/2
+                spent_tokens = 4
+            elif expenditure == "Full Game XP":
+                xp_reward = 1
+                spent_tokens = 6
+            elif expenditure == "Half Game XP":
+                xp_reward = 0.5
+                spent_tokens = 3
+            elif expenditure == "Full Game GP":
+                gp_reward = gold_by_tier(tier)
+                spent_tokens = 6
+            elif expenditure == "Half Game GP":
+                gp_reward = gold_by_tier(tier)/2
+                spent_tokens = 3
+            elif expenditure == "Other 6 token expenditure":
+                spent_tokens = 6
+            elif expenditure == "Other 3 token expenditure":
+                spent_tokens = 3
+
+            player = Player.objects.get(user=request.user)
+            if player.gm_tokens < spent_tokens:
+                context["message"] = "Insufficient GM tokens to do that! You tried to spend %d tokens but only have %d tokens." % (spent_tokens, player.gm_tokens)
+                context["error"] = True
+                context["logs"] = LedgerLog.objects.all().order_by("-created")
+                return render(request, "ledger.html", context)
+            player.gm_tokens -= spent_tokens
+            player.save()
+
+            character.xp += xp_reward
+            character.money += gp_reward
+            character.save()
+
+            note="%s's character %s received %.3f gp (%.3f=>%.3f) and %.3f game XP (%.3f=>%.3f) by redeeming %d GM tokens: \"%s\"." % (
+                request.user,
+                character.name,
+                gp_reward,
+                character.money - gp_reward,
+                character.money,
+                xp_reward,
+                character.xp - xp_reward,
+                character.xp,
+                spent_tokens,
+                expenditure if "Other" not in expenditure else "%s [%s]" % (expenditure, form.cleaned_data["if_other_specify_here"])
+            )
+            LedgerLog.objects.create(note=note)
+            context["message"] = note
+            context["logs"] = LedgerLog.objects.all().order_by("-created")
+            return render(request, "ledger.html", context)
+            
+        else:
+            print(form.errors)
+    else:
+        context = alwaysContext(request)
+        context["form"] = forms.RedeemGMRewardsForm(
+            character_name_choices = list([
+                (character.name, character.name) for character in Character.objects.filter(player__user=request.user)
+            ]),
+        )
+        return render(request, "redeem_gm_rewards.html", context)
 
 @login_required
 def character_list(request):

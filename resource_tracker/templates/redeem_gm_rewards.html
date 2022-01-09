@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}
+Redeem GM Rewards
+{% endblock %}
+{% block page_title %}
+Redeem GM Rewards
+{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block body %}
+<form action="{% url 'resource_tracker:redeem_gm_rewards' %}" method="POST">
+    {% csrf_token %}
+    {{form|crispy}}
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}

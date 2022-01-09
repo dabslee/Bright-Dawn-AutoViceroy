@@ -39,6 +39,25 @@ class RedeemViceroyRewardsForm(forms.Form):
         self.fields["character_name"].choices = character_name_choices
         self.fields["number_of_tokens"].choices = list([(i, i) for i in range(1, max_tokens+1)])
 
+class RedeemGMRewardsForm(forms.Form):
+    character_name = forms.ChoiceField(choices=())
+    expenditure = forms.ChoiceField(choices=(
+        ("Full Game XP + Full Game GP", "Full Game XP + Full Game GP (8 tokens)"),
+        ("Half Game XP + Half Game GP", "Half Game XP + Half Game GP (4 tokens)"),
+        ("Full Game XP", "Full Game XP (6 tokens)"),
+        ("Half Game XP", "Half Game XP (3 tokens)"),
+        ("Full Game GP", "Full Game GP (6 tokens)"),
+        ("Half Game GP", "Half Game GP (3 tokens)"),
+        ("Other 6 token expenditure", "Other 6 token expenditure (6 tokens)"),
+        ("Other 3 token expenditure", "Other 3 token expenditure (3 tokens)"),
+    ))
+    if_other_specify_here = forms.CharField(max_length=500, required=False)
+
+    def __init__(self, *args, **kwargs):
+        character_name_choices = kwargs.pop('character_name_choices')
+        super().__init__(*args, **kwargs)
+        self.fields["character_name"].choices = character_name_choices
+
 class SpendResourcesForm(forms.Form):
     character_name = forms.ChoiceField(choices=())
     spent_money = forms.FloatField(min_value=0, initial=0)
