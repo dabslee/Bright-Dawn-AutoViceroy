@@ -305,6 +305,7 @@ def claim_gm_rewards(request):
         context["form"] = forms.ClaimGMRewardsForm()
         return render(request, "claim_gm_rewards.html", context)
 
+@login_required
 def redeem_gm_rewards(request):
     if not Player.objects.get(user=request.user).isGM:
         raise PermissionDenied()

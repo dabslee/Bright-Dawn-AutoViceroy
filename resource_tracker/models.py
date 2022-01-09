@@ -5,6 +5,13 @@ from django.db.models.deletion import CASCADE
 from django.db.models.fields import related
 
 # Create your models here.
+class LedgerLog(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    note = models.CharField(max_length=500)
+
+    def __str__(self):
+        return "[" + str(self.created) + "]\t" + self.note
+
 class Player(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
@@ -73,10 +80,3 @@ class Trade(models.Model):
     money_amount = models.FloatField()
     what_was_purchased = models.TextField(max_length=1000)
     other_stipulations = models.TextField(max_length=1000)
-
-class LedgerLog(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    note = models.CharField(max_length=500)
-
-    def __str__(self):
-        return "[" + str(self.created) + "]\t" + self.note
