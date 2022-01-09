@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+Declare a Trade
+{% endblock %}
+{% block page_title %}
+Declare a Trade
+{% endblock %}
+
+{% block body %}
+<form action="{% url 'resource_tracker:declare_a_trade' %}" method="POST">
+    {% csrf_token %}
+    {{form|crispy}}
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}
+
+{% block footer %}
+<script>
+    (function($) {
+        $.fn.changeElementType = function(newType) {
+            var attrs = {};
+
+            $.each(this[0].attributes, function(idx, attr) {
+                attrs[attr.nodeName] = attr.nodeValue;
+            });
+
+            this.replaceWith(function() {
+                return $("<" + newType + "/>", attrs).append($(this).contents());
+            });
+        };
+    })(jQuery);
+    $("#id_other_player_character_name").changeElementType("select");
+    $("#id_other_player_username").val("");
+    $("#id_other_player_username").change(function() {
+        $.ajax({
+            url: "/resource_tracker/get_all_characters_from_username/"+encodeURIComponent($("#id_other_player_username").val()),
+            success: function(result){
+                let options = "";
+                for (option of result.split("<br>")) {
+                    if (option != "") {
+                        options += `<option value=\"${option}\">${option}</option>`
+                    }
+                }
+                $("#id_other_player_character_name").html(options);
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,9 +1,10 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
-from .models import LedgerLog, Player, Character, Debt
+from .models import LedgerLog, Player, Character, Debt, Trade
 from . import forms
 from django.contrib.auth.models import User as AuthUser
 from django.http import HttpResponse
+from django.db.models import Q
 
 from datetime import datetime
 from brightdawn.views import alwaysContext, lastSundayMidnight
@@ -40,6 +41,16 @@ def get_approval_characters_from_discord(request, discord):
     for chr in Character.objects.filter(
             status="PA",
             player__discord=discord
+        ):
+        result += str(chr.name) + "<br>"
+    return HttpResponse(
+        result
+    )
+
+def get_all_characters_from_username(request, username):
+    result = ""
+    for chr in Character.objects.filter(
+            player__user__username=username
         ):
         result += str(chr.name) + "<br>"
     return HttpResponse(
@@ -413,3 +424,131 @@ def my_account(request):
     context["player"] = Player.objects.get(user=request.user)
     context["characters"] = Character.objects.filter(player__user=request.user)
     return render(request, "my_account.html", context)
+
+@login_required
+def declare_a_trade(request):
+    context = alwaysContext(request)
+    if request.method == 'POST':
+        form = forms.TradeForm(request.POST,
+            character_name_choices = list([
+                (character.name, character.name) for character in Character.objects.filter(player__user=request.user)
+            ])
+        )
+
+        if form.is_valid():
+            if form.cleaned_data["selling_or_buying"] == "Selling":
+                seller = Character.objects.get(player__user=request.user, name=form.cleaned_data["my_character_name"])
+                buyer = Character.objects.get(player__user__username=form.cleaned_data["other_player_username"], name=form.cleaned_data["other_player_character_name"])
+                seller_verified = True
+                buyer_verified = False
+            else:
+                buyer = Character.objects.get(player__user=request.user, name=form.cleaned_data["my_character_name"])
+                seller = Character.objects.get(player__user__username=form.cleaned_data["other_player_username"], name=form.cleaned_data["other_player_character_name"])
+                buyer_verified = True
+                seller_verified = False
+            trade = Trade.objects.create(
+                seller = seller,
+                seller_verified = seller_verified,
+                buyer = buyer,
+                buyer_verified = buyer_verified,
+                money_amount = form.cleaned_data["money_amount"],
+                what_was_purchased = form.cleaned_data["what_is_being_purchased"],
+                other_stipulations = form.cleaned_data["other_stipulations"],
+            )
+            context["message"] = "You have created the pending trade: \"%s\". Your resources will be updated and the trade will show up on the ledger once the other player has verified it." % str(trade)
+            context["logs"] = LedgerLog.objects.all().order_by("-created")
+            return render(request, "ledger.html", context)
+        else:
+            print(form.errors)
+    else:
+        context = alwaysContext(request)
+        context["form"] = forms.TradeForm(
+            character_name_choices = list([
+                (character.name, character.name) for character in Character.objects.filter(player__user=request.user)
+            ])
+        )
+        return render(request, "declare_a_trade.html", context)
+
+@login_required
+def verify_a_trade(request):
+    context = alwaysContext(request)
+    context["trades_verify"] = Trade.objects.filter(
+        ((Q(seller__player__user=request.user)
+        & Q(seller_verified=False))
+        | (Q(buyer__player__user=request.user)
+        & Q(buyer_verified=False)))
+        
+        & (Q(rejected=False))
+    ).order_by("-created")
+    context["trades_pending"] = Trade.objects.filter(
+        ((Q(seller__player__user=request.user)
+        & Q(buyer_verified=False))
+        | (Q(buyer__player__user=request.user)
+        & Q(seller_verified=False)))
+
+        & (Q(rejected=False))
+    ).order_by("-created")
+    context["trades_past"] = Trade.objects.filter(
+        (Q(seller__player__user=request.user)
+        | Q(buyer__player__user=request.user))
+
+        & ((Q(seller_verified=True) & Q(buyer_verified=True))
+        | (Q(rejected=True)))
+    ).order_by("-created")
+    return render(request, "verify_a_trade.html", context)
+
+def verify_trade_id(request, trade_id):
+    context = alwaysContext(request)
+    trade = Trade.objects.get(id=trade_id)
+
+    # verify resources
+    if trade.buyer.money < trade.money_amount:
+        context["message"] = "The buyer does not have enough money for this trade to go through!"
+        context["error"] = True
+        context["logs"] = LedgerLog.objects.all().order_by("-created")
+        return render(request, "ledger.html", context)
+
+    # verify authorization
+    if not trade.seller_verified and request.user == trade.seller.player.user:
+        trade.seller_verified = True
+    elif not trade.buyer_verified and request.user == trade.buyer.player.user:
+        trade.buyer_verified = True
+    else:
+        raise PermissionDenied()
+    trade.save()
+    
+    # update resources
+    trade.buyer.money -= trade.money_amount
+    trade.seller.money += trade.money_amount
+
+    # log trade
+    before_and_after = "%s has gone from %.3f gp to %.3f, and %s has gone from %.3f to %.3f." % (
+        str(trade.buyer),
+        trade.buyer.money + trade.money_amount,
+        trade.buyer.money,
+        str(trade.seller),
+        trade.seller.money - trade.money_amount,
+        trade.seller.money,
+    )
+    LedgerLog.objects.create(note="%s %s" % (str(trade), before_and_after))
+    context["message"] = "The trade \"%s\" has been completed. %s" % (str(trade), before_and_after)
+    context["logs"] = LedgerLog.objects.all().order_by("-created")
+    return render(request, "ledger.html", context)
+
+def reject_trade_id(request, trade_id):
+    context = alwaysContext(request)
+    trade = Trade.objects.get(id=trade_id)
+
+    # verify authorization
+    if not trade.seller_verified and request.user == trade.seller.player.user:
+        trade.rejected = True
+    elif not trade.buyer_verified and request.user == trade.buyer.player.user:
+        trade.rejected = True
+    else:
+        raise PermissionDenied()
+    trade.save()
+    
+    # log trade
+    context["message"] = "You have successfully rejected trade \"" + str(trade) + "\"."
+    context["logs"] = LedgerLog.objects.all().order_by("-created")
+    return render(request, "ledger.html", context)

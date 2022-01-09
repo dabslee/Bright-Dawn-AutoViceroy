@@ -87,4 +87,18 @@ a {
   background-color: var(--superdarkgray);
 }
 
+.btn {
+  font-weight: bold;
+}
+.btn:hover {
+  opacity: 0.7;
+}
+
+.bg-danger {
+  opacity: 0.8;
+}
+.bg-danger:hover {
+  opacity: 0.6;
+}
+
 /*# sourceMappingURL=main.css.map */

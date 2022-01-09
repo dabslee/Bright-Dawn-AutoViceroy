@@ -73,10 +73,23 @@ class Debt(models.Model):
         return "%s owes %s %.3fgp" % (self.debtor, self.creditor, self.amount)
 
 class Trade(models.Model):
-    seller = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="trade_of_seller")
+    created = models.DateTimeField(auto_now_add=True)
+    seller = models.ForeignKey(Character, on_delete=models.CASCADE, related_name="trade_of_seller")
     seller_verified = models.BooleanField()
-    buyer = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="trade_of_buyer")
+    buyer = models.ForeignKey(Character, on_delete=models.CASCADE, related_name="trade_of_buyer")
     buyer_verified = models.BooleanField()
     money_amount = models.FloatField()
     what_was_purchased = models.TextField(max_length=1000)
     other_stipulations = models.TextField(max_length=1000)
+    rejected = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "%s's character %s sells %s's character %s <%s> for %.3f gp. Additional notes: [%s]." % (
+            self.seller.player.user.username,
+            self.seller.name,
+            self.buyer.player.user.username,
+            self.buyer.name,
+            self.what_was_purchased,
+            self.money_amount,
+            self.other_stipulations,
+        )
