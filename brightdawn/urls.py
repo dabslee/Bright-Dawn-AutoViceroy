@@ -22,7 +22,6 @@ from . import views as core_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', core_views.home, name='home'),
-    path('success/', core_views.success, name='success'),
     path('authentication/', include('authentication.urls'), name='authentication'),
     path('resource_tracker/', include('resource_tracker.urls'), name='resource_tracker'),
 ]

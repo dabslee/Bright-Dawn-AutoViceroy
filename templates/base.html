@@ -105,7 +105,7 @@
 
                     <div class="d-flex flex-sm-row flex-column" style="flex: 2 2 auto; justify-content: flex-end;">
                         <li class="nav-item"><a class="nav-link" href="{% url 'resource_tracker:my_account' %}">Logged in as <i>{{user.username}}</i></a></li>
-                        <a class="nav-link" href="{% url 'authentication:logout' %}">Log Out</a>
+                        <li><a class="nav-link" href="{% url 'authentication:logout' %}">Log Out</a></li>
     
                         {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'authentication:login' %}">Log In</a></li>

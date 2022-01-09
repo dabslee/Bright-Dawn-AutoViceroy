@@ -1,5 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .models import LedgerLog, Player, Character, Debt
 from . import forms
 from django.contrib.auth.models import User as AuthUser
@@ -57,11 +57,20 @@ def claim_downtime(request):
         user_player.downtime += 10
         user_player.last_downtime_claim = datetime.now()
         user_player.save()
-        LedgerLog.objects.create(note="%s claimed 10 downtime days." % user_player.user.username)
-        return redirect("resource_tracker:ledger")
+
+        most_recent = LedgerLog.objects.create(note="%s claimed 10 downtime days, going from %d days to %d days." % (
+            user_player.user.username,
+            user_player.downtime-10,
+            user_player.downtime
+        ))
+        context["message"] = most_recent.note
+        context["logs"] = LedgerLog.objects.all().order_by("-created")
+        return render(request, "ledger.html", context)
     else:
+        context["error"] = True
         context["message"] = "Unsuccessful! Downtime already claimed for this week!"
-        return render(request, "success.html", context)
+        context["logs"] = LedgerLog.objects.all().order_by("-created")
+        return render(request, "ledger.html", context)
 
 @login_required
 def spend_resources(request):
@@ -80,15 +89,24 @@ def spend_resources(request):
             user_player.spellcaster_hours -= form.cleaned_data["spent_spellcaster_hours"]
             character.save()
             user_player.save()
-            LedgerLog.objects.create(note="%s's character %s spent %.3f gp, %d downtime days, and %.3f spellcasting hours: \"%s\"" % (
+            note="%s's character %s spent %.3f gp (%.3f=>%.3f), %d downtime days (%d=>%d), and %.3f spellcasting hours (%.3f=>%.3f): \"%s\"" % (
                 request.user,
                 character.name,
                 form.cleaned_data["spent_money"],
+                character.money + form.cleaned_data["spent_money"],
+                character.money,
                 form.cleaned_data["spent_downtime"],
+                user_player.downtime + form.cleaned_data["spent_downtime"],
+                user_player.downtime,
                 form.cleaned_data["spent_spellcaster_hours"],
+                user_player.spellcaster_hours + form.cleaned_data["spent_spellcaster_hours"],
+                user_player.spellcaster_hours,
                 form.cleaned_data["reason_for_expenditure"],
-            ))
-            return redirect("resource_tracker:ledger")
+            )
+            LedgerLog.objects.create(note=note)
+            context["message"] = note
+            context["logs"] = LedgerLog.objects.all().order_by("-created")
+            return render(request, "ledger.html", context)
         else:
             print(form.errors)
     else:
@@ -97,9 +115,11 @@ def spend_resources(request):
         ]))
         return render(request, "spend_resources.html", context)
 
+@login_required
 def character_approval(request):
-    if not request.user.is_authenticated or not Player.objects.get(user=request.user).isViceroy:
+    if not Player.objects.get(user=request.user).isViceroy:
         raise PermissionDenied()
+    context = alwaysContext(request)
     if request.method == 'POST':
         form = forms.CharacterApprovalForm(request.POST)
 
@@ -135,18 +155,20 @@ def character_approval(request):
             viceroy = Player.objects.get(user=request.user)
             viceroy.viceroy_tokens += tier
             viceroy.save()
-            LedgerLog.objects.create(note="%s received %d viceroy tokens for approving %s's tier %d character, %s." %(
+            note="%s received %d viceroy tokens for approving %s's tier %d character, %s." %(
                 request.user.username,
                 tier,
                 player.user.username,
                 tier,
                 character.name
-            ))
-            return redirect("resource_tracker:ledger")
+            )
+            LedgerLog.objects.create(note=note)
+            context["message"] = note
+            context["logs"] = LedgerLog.objects.all().order_by("-created")
+            return render(request, "ledger.html", context)
         else:
             print(form.errors)
     else:
-        context = alwaysContext(request)
         context["form"] = forms.CharacterApprovalForm()
         context["discords"] = [player.discord for player in Player.objects.all()]
         return render(request, "character_approval.html", context)
@@ -155,6 +177,7 @@ def character_approval(request):
 def redeem_viceroy_rewards(request):
     if not Player.objects.get(user=request.user).isViceroy:
         raise PermissionDenied()
+    context = alwaysContext(request)
     if request.method == 'POST':
         form = forms.RedeemViceroyRewardsForm(request.POST,
             character_name_choices = list([
@@ -182,13 +205,18 @@ def redeem_viceroy_rewards(request):
             player = Player.objects.get(user=request.user)
             player.viceroy_tokens -= number_of_tokens
             player.save()
-            LedgerLog.objects.create(note="%s's character %s received %.3f gp by redeeming %d viceroy tokens." % (
+            note="%s's character %s received %.3f gp (%.3f=>%.3f) by redeeming %d viceroy tokens." % (
                 request.user,
                 character.name,
                 total_reward,
+                character.money - total_reward,
+                character.money,
                 number_of_tokens
-            ))
-            return redirect("resource_tracker:ledger")
+            )
+            LedgerLog.objects.create(note=note)
+            context["message"] = note
+            context["logs"] = LedgerLog.objects.all().order_by("-created")
+            return render(request, "ledger.html", context)
         else:
             print(form.errors)
     else:
@@ -203,6 +231,7 @@ def redeem_viceroy_rewards(request):
 
 @login_required
 def claim_game_rewards(request):
+    context = alwaysContext(request)
     if request.method == 'POST':
         form = forms.ClaimGameRewardsForm(request.POST,
             character_name_choices = list([
@@ -214,14 +243,21 @@ def claim_game_rewards(request):
             character.xp += form.cleaned_data["earned_xp"]
             character.money += form.cleaned_data["earned_gp"]
             character.save()
-            LedgerLog.objects.create(note="%s's character %s received %.3f gp and %.3f game's xp for completing game %s." % (
+            note="%s's character %s received %.3f gp (%.3f=>%.3f) and %.3f game's xp (%.3f=>%.3f) for completing game %s." % (
                 request.user,
                 character.name,
                 form.cleaned_data["earned_gp"],
+                character.money - form.cleaned_data["earned_gp"],
+                character.money,
                 form.cleaned_data["earned_xp"],
+                character.xp - form.cleaned_data["earned_xp"],
+                character.xp,
                 form.cleaned_data["game_id"],
-            ))
-            return redirect("resource_tracker:ledger")
+            )
+            LedgerLog.objects.create(note=note)
+            context["message"] = note
+            context["logs"] = LedgerLog.objects.all().order_by("-created")
+            return render(request, "ledger.html", context)
         else:
             print(form.errors)
     else:
@@ -235,6 +271,7 @@ def claim_game_rewards(request):
 def claim_gm_rewards(request):
     if not Player.objects.get(user=request.user).isGM:
         raise PermissionDenied()
+    context = alwaysContext(request)
     if request.method == 'POST':
         form = forms.ClaimGMRewardsForm(request.POST)
 
@@ -242,12 +279,15 @@ def claim_gm_rewards(request):
             player = Player.objects.get(user=request.user)
             player.gm_tokens += form.cleaned_data["gm_tokens"]
             player.save()
-            LedgerLog.objects.create(note="%s received %d GM tokens for running game %s." % (
+            note="%s received %d GM tokens for running game %s." % (
                 request.user,
                 form.cleaned_data["gm_tokens"],
                 form.cleaned_data["game_id"],
-            ))
-            return redirect("resource_tracker:ledger")
+            )
+            LedgerLog.objects.create(note=note)
+            context["message"] = note
+            context["logs"] = LedgerLog.objects.all().order_by("-created")
+            return render(request, "ledger.html", context)
         else:
             print(form.errors)
     else:

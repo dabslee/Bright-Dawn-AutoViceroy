@@ -24,6 +24,3 @@ def alwaysContext(request):
 
 def home(request):
     return render(request, "home.html", alwaysContext(request))
-
-def success(request):
-    return render(request, "success.html", alwaysContext(request))

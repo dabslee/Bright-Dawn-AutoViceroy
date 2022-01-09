@@ -68,3 +68,20 @@ input[type=submit] {
 .card {
     background-color: rgba(255,255,255,0.1) !important;
 }
+
+.alert-primary {
+    color: var(--offwhite);
+    background-color: rgba(0, 140, 255, 0.15);
+}
+.alert-danger {
+    color: var(--offwhite);
+    background-color: rgba(255, 0, 0, 0.2);
+}
+
+.navbar {
+    li a {
+        &:hover {
+            background-color: var(--superdarkgray);
+        }
+    }
+}

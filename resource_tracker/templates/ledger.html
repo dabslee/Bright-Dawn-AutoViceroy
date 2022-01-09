@@ -9,6 +9,12 @@ Public Ledger
 
 {% block body %}
 
+{% if message %}
+<div class="alert {% if error %}alert-danger{% else %}alert-primary{% endif %} mb-3 fw-bold">
+    {{message}}
+</div>
+{% endif %}
+
 <table class="table">
     <thead>
         <tr>
