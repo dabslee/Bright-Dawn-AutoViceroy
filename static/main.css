@@ -13,6 +13,10 @@ table th, table td {
   text-align: left;
 }
 
+h2 {
+  background-color: #574423 !important;
+}
+
 body {
   background-color: var(--superdarkgray);
   color: var(--offwhite);

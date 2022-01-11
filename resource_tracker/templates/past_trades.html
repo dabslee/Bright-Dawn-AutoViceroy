@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}
+Past Trades
+{% endblock %}
+{% block page_title %}
+Past Trades
+{% endblock %}
+
+{% block body %}
+
+{% if not trades_past %}
+<p>No past trades!</p>
+{% endif %}
+{% for trade in trades_past %}
+<div class="card mb-3">
+    <div class="card-body d-flex flex-sm-row flex-column">
+        <div class="me-sm-5">
+            <h4>{{trade.what_was_purchased}}</h4>
+            <p><i>{{trade.created}}</i></p>
+            {% if trade.rejected %}
+            <p style="color: red;">REJECTED</p>
+            {% else %}
+            <p style="color: green;">SUCCESSFUL</p>
+            {% endif %}
+        </div>
+        <ul style="flex: 2 2 auto">
+            <li><b>Seller:</b> {{trade.seller}}</li>
+            <li><b>Buyer:</b> {{trade.buyer}}</li>
+            <li><b>Money amount:</b> {{trade.money_amount}}</li>
+            <li><b>What is being purchased:</b> {{trade.what_was_purchased}}</li>
+            <li><b>Other Stipulations/Notes:</b> {{trade.other_stipulations}}</li>
+        </ul>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

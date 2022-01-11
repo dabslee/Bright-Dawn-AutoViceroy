@@ -17,6 +17,7 @@ urlpatterns = [
     path('my_account/', views.my_account, name='my_account'),
     path('declare_a_trade/', views.declare_a_trade, name='declare_a_trade'),
     path('verify_a_trade/', views.verify_a_trade, name='verify_a_trade'),
+    path('past_trades/', views.past_trades, name='past_trades'),
     path('verify_trade_id/<trade_id>/', views.verify_trade_id, name='verify_trade_id'),
     path('reject_trade_id/<trade_id>/', views.reject_trade_id, name='reject_trade_id'),
 

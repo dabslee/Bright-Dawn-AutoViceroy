@@ -488,6 +488,10 @@ def verify_a_trade(request):
 
         & (Q(rejected=False))
     ).order_by("-created")
+    return render(request, "verify_a_trade.html", context)
+
+def past_trades(request):
+    context = alwaysContext(request)
     context["trades_past"] = Trade.objects.filter(
         (Q(seller__player__user=request.user)
         | Q(buyer__player__user=request.user))
@@ -495,7 +499,7 @@ def verify_a_trade(request):
         & ((Q(seller_verified=True) & Q(buyer_verified=True))
         | (Q(rejected=True)))
     ).order_by("-created")
-    return render(request, "verify_a_trade.html", context)
+    return render(request, "past_trades.html", context)
 
 def verify_trade_id(request, trade_id):
     context = alwaysContext(request)
