@@ -25,7 +25,12 @@ class ClaimGameRewardsForm(forms.Form):
         self.fields["character_name"].choices = character_name_choices
 
 class ClaimGMRewardsForm(forms.Form):
-    gm_tokens = forms.IntegerField()
+    gm_tokens = forms.ChoiceField(choices=(
+        (3, "Half game (1.5-3 hours): 3 token reward"),
+        (6, "Full game (3-5.5 hours): 6 token reward"),
+        (9, "1.5 game (5.5-7 hours): 9 token reward"),
+        (12, "Double game (7-9.5 hours): 12 token reward"),
+    ))
     game_id = forms.CharField(max_length=50)
 
 class RedeemViceroyRewardsForm(forms.Form):

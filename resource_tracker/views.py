@@ -110,9 +110,8 @@ def spend_resources(request):
             user_player.spellcaster_hours -= form.cleaned_data["spent_spellcaster_hours"]
             character.save()
             user_player.save()
-            note="%s's character %s spent %.3f gp (%.3f=>%.3f), %d downtime days (%d=>%d), and %.3f spellcasting hours (%.3f=>%.3f): \"%s\"" % (
-                request.user,
-                character.name,
+            note="%s spent %.3f gp (%.3f=>%.3f), %d downtime days (%d=>%d), and %.3f spellcasting hours (%.3f=>%.3f): \"%s\"" % (
+                str(character),
                 form.cleaned_data["spent_money"],
                 character.money + form.cleaned_data["spent_money"],
                 character.money,
@@ -165,13 +164,19 @@ def character_approval(request):
                     name = form.cleaned_data["character_name"],
                     money = form.cleaned_data["character_starting_wealth"]
                 )
-                LedgerLog.objects.create(note="%s's character %s received their first approval from viceroy %s." % (player.user.username, character.name, request.user.username))
+                LedgerLog.objects.create(note="%s received their first approval from viceroy %s." % (
+                    str(character),
+                    request.user.username)
+                )
             else: # if second approval
                 character.update(status="AC")
                 character.update(approved=datetime.now())
                 character.update(money=form.cleaned_data["character_starting_wealth"])
                 character = character.first()
-                LedgerLog.objects.create(note="%s's character %s received their second approval from viceroy %s." % (player.user.username, character.name, request.user.username))
+                LedgerLog.objects.create(note="%s received their second approval from viceroy %s." % (
+                    str(character),
+                    request.user.username)
+                )
             tier = int(form.cleaned_data["character_tier"])
             viceroy = Player.objects.get(user=request.user)
             viceroy.viceroy_tokens += tier
@@ -226,9 +231,8 @@ def redeem_viceroy_rewards(request):
             player = Player.objects.get(user=request.user)
             player.viceroy_tokens -= number_of_tokens
             player.save()
-            note="%s's character %s received %.3f gp (%.3f=>%.3f) by redeeming %d viceroy tokens." % (
-                request.user,
-                character.name,
+            note="%s %s received %.3f gp (%.3f=>%.3f) by redeeming %d viceroy tokens." % (
+                str(character),
                 total_reward,
                 character.money - total_reward,
                 character.money,
@@ -264,9 +268,8 @@ def claim_game_rewards(request):
             character.xp += form.cleaned_data["earned_xp"]
             character.money += form.cleaned_data["earned_gp"]
             character.save()
-            note="%s's character %s received %.3f gp (%.3f=>%.3f) and %.3f game's xp (%.3f=>%.3f) for completing game %s." % (
-                request.user,
-                character.name,
+            note="%s received %.3f gp (%.3f=>%.3f) and %.3f game's xp (%.3f=>%.3f) for completing game %s." % (
+                str(character),
                 form.cleaned_data["earned_gp"],
                 character.money - form.cleaned_data["earned_gp"],
                 character.money,
@@ -298,11 +301,11 @@ def claim_gm_rewards(request):
 
         if form.is_valid():
             player = Player.objects.get(user=request.user)
-            player.gm_tokens += form.cleaned_data["gm_tokens"]
+            player.gm_tokens += int(form.cleaned_data["gm_tokens"])
             player.save()
             note="%s received %d GM tokens for running game %s." % (
                 request.user,
-                form.cleaned_data["gm_tokens"],
+                int(form.cleaned_data["gm_tokens"]),
                 form.cleaned_data["game_id"],
             )
             LedgerLog.objects.create(note=note)
@@ -374,9 +377,8 @@ def redeem_gm_rewards(request):
             character.money += gp_reward
             character.save()
 
-            note="%s's character %s received %.3f gp (%.3f=>%.3f) and %.3f game XP (%.3f=>%.3f) by redeeming %d GM tokens: \"%s\"." % (
-                request.user,
-                character.name,
+            note="%s received %.3f gp (%.3f=>%.3f) and %.3f game XP (%.3f=>%.3f) by redeeming %d GM tokens: \"%s\"." % (
+                str(character),
                 gp_reward,
                 character.money - gp_reward,
                 character.money,
@@ -490,6 +492,7 @@ def verify_a_trade(request):
     ).order_by("-created")
     return render(request, "verify_a_trade.html", context)
 
+@login_required
 def past_trades(request):
     context = alwaysContext(request)
     context["trades_past"] = Trade.objects.filter(
@@ -501,6 +504,7 @@ def past_trades(request):
     ).order_by("-created")
     return render(request, "past_trades.html", context)
 
+@login_required
 def verify_trade_id(request, trade_id):
     context = alwaysContext(request)
     trade = Trade.objects.get(id=trade_id)
@@ -539,6 +543,7 @@ def verify_trade_id(request, trade_id):
     context["logs"] = LedgerLog.objects.all().order_by("-created")
     return render(request, "ledger.html", context)
 
+@login_required
 def reject_trade_id(request, trade_id):
     context = alwaysContext(request)
     trade = Trade.objects.get(id=trade_id)
