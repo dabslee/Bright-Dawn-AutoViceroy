@@ -231,7 +231,7 @@ def redeem_viceroy_rewards(request):
             player = Player.objects.get(user=request.user)
             player.viceroy_tokens -= number_of_tokens
             player.save()
-            note="%s %s received %.3f gp (%.3f=>%.3f) by redeeming %d viceroy tokens." % (
+            note="%s received %.3f gp (%.3f=>%.3f) by redeeming %d viceroy tokens." % (
                 str(character),
                 total_reward,
                 character.money - total_reward,
